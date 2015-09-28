@@ -13,13 +13,19 @@ class NeuralNetwork(object):
         self.weights = [np.random.randn(y, x)
                         for x, y in zip(sizes[:-1], sizes[1:])]
 
-    def feedforward(self, x):
+    def feedforward(self, x, dropout_percent=None):
         """ Run the input through the network with the current settings of
         weights and biases according to the following equation:
         a' = sigmoid(wa + b)"""
         activations = [x]
         for b, w in zip(self.biases, self.weights):
             activations.append(sigmoid(w.dot(activations[-1]) + b))
+            if dropout_percent:
+                drop_rate = 1 - dropout_percent
+                activations[-1] *= \
+                    np.random.binomial([np.ones(())],
+                                       1 - drop_rate * (1.0 / drop_rate))
+
         return activations
 
     def backpropagate(self, activations, y):
